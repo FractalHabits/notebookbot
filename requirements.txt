@@ -1,0 +1,13 @@
+python-dotenv
+cryptography
+pypng
+openai
+requests
+langchain
+langchain-community
+langchain-openai
+langchain-anthropic
+langgraph
+arxiv
+pymupdf
+gradio
