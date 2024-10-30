@@ -1,24 +1,28 @@
 import os
 import sys
 
-from typing import Annotated, Literal, TypedDict
-from langchain_core.messages import HumanMessage, AIMessage
-from langchain_community.utilities import ArxivAPIWrapper
-from langchain_community.tools import BraveSearch
-
 # Add the project root to the Python path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.insert(0, project_root)
 
+# Standard library imports
+from typing import Annotated, Literal, TypedDict
+
+# Third-party imports
 from dotenv import load_dotenv
-from notebookbot.authentication.authentication_manager import AuthenticationManager
-from notebookbot.scripts.authentication_setup import AuthenticationSetup
+from langchain_anthropic import ChatAnthropic
+from langchain_community.document_loaders import ArxivLoader
+from langchain_community.tools import BraveSearch
+from langchain_community.utilities import ArxivAPIWrapper
+from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.tools import tool
 from langgraph.checkpoint.memory import MemorySaver
-from langgraph.graph import END, START, StateGraph, MessagesState
+from langgraph.graph import END, MessagesState, START, StateGraph
 from langgraph.prebuilt import ToolNode
-from langchain_community.document_loaders import ArxivLoader
-from langchain_anthropic import ChatAnthropic
+
+# Local application imports
+from notebookbot.authentication.authentication_manager import AuthenticationManager
+from notebookbot.authentication.authentication_setup import AuthenticationSetup
 
 def main():
     # Get API keys

@@ -68,3 +68,21 @@ class AuthenticationManager:
             print("You need to authenticate first to retrieve API keys.")
             self.setup_or_authenticate()
             return self.get_api_key(key_name)
+
+    def _try_authenticate(self, auth_manager, max_attempts=3):
+        """Try to authenticate with multiple attempts."""
+        attempts = 0
+        while attempts < max_attempts:
+            auth_manager.setup_or_authenticate()
+            if auth_manager.is_authenticated:
+                return True
+
+            attempts += 1
+            remaining = max_attempts - attempts
+            if remaining > 0:
+                print(f"Incorrect password. You have {remaining} {'attempts' if remaining > 1 else 'attempt'} remaining.")
+            else:
+                print("Maximum password attempts exceeded. Please try again later.")
+                auth_manager.is_authenticated = False  # Set is_authenticated to False after max attempts
+
+        return auth_manager.is_authenticated

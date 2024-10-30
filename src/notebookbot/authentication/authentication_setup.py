@@ -46,7 +46,7 @@ class AuthenticationSetup:
         if self._keys_exist():
             print("Keys already exist. Skipping password setup.")
             self.auth_manager = AuthenticationManager(self.env_file_path)
-            if try_authenticate(self.auth_manager):
+            if self._try_authenticate(self.auth_manager):
                 self._show_available_keys()
                 return True
             return False
@@ -65,8 +65,9 @@ class AuthenticationSetup:
                 return False
                 
             self.auth_manager = AuthenticationManager(self.env_file_path)
-            if try_authenticate(self.auth_manager):
+            if self._try_authenticate(self.auth_manager):
                 self._show_available_keys()
+                self._setup_keys()  # Add this line to set up keys if none exist
                 return True
         
         return False
@@ -98,7 +99,7 @@ class AuthenticationSetup:
             
         return APIKeys(openai=openai_key, anthropic=anthropic_key)
 
-    def setup_keys(self):
+    def _setup_keys(self):
         """Set up API keys interactively."""
         if not self.auth_manager or not self.auth_manager.is_authenticated:
             raise ValueError("Must authenticate first")
@@ -108,19 +109,33 @@ class AuthenticationSetup:
             raise ValueError("Authentication manager not properly initialized")
 
         encryption_manager = self.auth_manager.api_interface.encryption_manager
-        
-        print("\nLet's set up your API keys.")
-        for key_name in ["OPENAI_API_KEY", "ANTHROPIC_API_KEY"]:
-            while True:
-                choice = input(f"Do you want to enter your {key_name}? (yes/no): ").strip().lower()
-                if choice in ('yes', 'y'):
-                    api_key = getpass.getpass(f"Enter your {key_name}: ")
-                    encryption_manager.encrypt_and_store_key(key_name, api_key)
-                    print(f"{key_name} added successfully.")
-                    break
-                if choice in ('no', 'n'):
-                    break
-                print("Please enter 'yes' or 'no")
+        existing_keys = encryption_manager.list_keys()
+
+        if not existing_keys:
+            print("\nLet's set up your API keys.")
+        else:
+            print("\nYou already have the following API keys stored:")
+            for key in sorted(existing_keys):
+                print(f"- {key}")
+
+        keys_to_setup = ["OPENAI_API_KEY", "ANTHROPIC_API_KEY"]
+        keys_to_setup = [key for key in keys_to_setup if key not in existing_keys]
+
+        if keys_to_setup:
+            print("\nLet's set up the remaining API keys.")
+            for key_name in keys_to_setup:
+                while True:
+                    choice = input(f"Do you want to enter your {key_name}? (yes/no): ").strip().lower()
+                    if choice in ('yes', 'y'):
+                        api_key = getpass.getpass(f"Enter your {key_name}: ")
+                        encryption_manager.encrypt_and_store_key(key_name, api_key)
+                        print(f"{key_name} added successfully.")
+                        break
+                    if choice in ('no', 'n'):
+                        break
+                    print("Please enter 'yes' or 'no")
+        else:
+            print("\nAll API keys are already set up.")
 
         # Show final status
         print("\nSetup complete!")
@@ -140,6 +155,22 @@ class AuthenticationSetup:
                 return 'OPENAI_API_KEY_ENCRYPTED=' in content and 'ANTHROPIC_API_KEY_ENCRYPTED=' in content
         except FileNotFoundError:
             return False
+
+    def _try_authenticate(self, auth_manager, max_attempts=3):
+        """Try to authenticate with multiple attempts."""
+        attempts = 0
+        while attempts < max_attempts:
+            auth_manager.setup_or_authenticate()
+            if auth_manager.is_authenticated:
+                return True
+            
+            attempts += 1
+            remaining = max_attempts - attempts
+            if remaining > 0:
+                print(f"Incorrect password. You have {remaining} {'attempts' if remaining > 1 else 'attempt'} remaining.")
+    
+        print("Maximum password attempts exceeded. Please try again later.")
+        return False
 
 # Keep existing functions for CLI usage
 def try_authenticate(auth_manager, max_attempts=3):
@@ -206,9 +237,8 @@ def get_existing_keys(auth_manager):
 
 def main():
     setup = AuthenticationSetup()
-    if not setup.authenticate():
-        return
-    setup.setup_keys()
+    if setup.authenticate():
+        setup._setup_keys()  # Call the _setup_keys method here
 
 if __name__ == "__main__":
     main()
