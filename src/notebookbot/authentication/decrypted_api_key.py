@@ -1,13 +1,13 @@
-from .api_key_retriever import APIKeyRetriever
+from .api_key_encryption_manager import APIKeyEncryptionManager
 
 class DecryptedAPIKey:
     """
     A class representing a decrypted API key, with lazy evaluation.
     Decrypts the key only when called.
     """
-    def __init__(self, key_name: str, retriever: APIKeyRetriever):
+    def __init__(self, key_name: str, encryption_manager: APIKeyEncryptionManager):
         self.key_name = key_name
-        self.retriever = retriever
+        self.encryption_manager = encryption_manager
 
     def __call__(self):
         """
@@ -15,4 +15,4 @@ class DecryptedAPIKey:
         Returns:
             str: The decrypted API key.
         """
-        return self.retriever.authenticate_and_get_key(self.key_name)
+        return self.encryption_manager.decrypt_key(self.key_name)
