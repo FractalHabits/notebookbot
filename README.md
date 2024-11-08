@@ -8,8 +8,8 @@ Then download the `getting_started.ipynb` file and run it in your preferred Jupy
 
 ### Steps to Download and Run
 
-1. Click the link below to download the notebook:
-   <a href="[https://raw.githubusercontent.com/FractalHabits/notebookbot/main/getting_started.ipynb](https://github.com/FractalHabits/notebookbot/raw/main/getting_started.ipynb)" download="getting_started.ipynb">Download getting_started.ipynb</a>
+1. Click the link below to download the notebook (right-click and choose "Save link as..."):
+   [Download getting_started.ipynb](https://raw.githubusercontent.com/FractalHabits/notebookbot/main/getting_started.ipynb)
    
 3. Open the downloaded file in a computational notebook like Jupyter Notebook or Colab.
 
