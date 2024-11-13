@@ -1,5 +1,6 @@
 import os
 import sys
+import uuid
 
 # Add the project root to the Python path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -23,7 +24,7 @@ from langgraph.prebuilt import ToolNode
 # Local application imports
 from notebookbot.authentication.authentication_manager import AuthenticationManager
 from notebookbot.authentication.authentication_setup import AuthenticationSetup
-
+from notebookbot.data.save_documents_to_json import save_documents_to_json
 def main():
     # Get API keys
     auth = AuthenticationSetup()
@@ -35,10 +36,39 @@ def main():
         
         # Setup LangChain
         @tool
-        def arxiv_search(query: str):
-            """Call to search arxiv."""
-            arxiv = ArxivAPIWrapper()
-            return arxiv.run(query)
+        def arxiv_search(query: str,
+                        max_results: int = 10,
+                        load_max_refs: int = 10,
+                        categories: list[str] = [],
+                        sort_by: Literal["relevance",
+                                          "lastUpdatedDate",
+                                          "submittedDate"] = "relevance",
+                        sort_order: Literal["ascending", "descending"] = "descending"
+                        ) -> list:
+            """
+            Call to search arxiv and return a list of documents.
+            arxiv_search(query: str,
+                        max_results: int = 10,
+                        load_max_refs: int = 10,
+                        categories: list[str] = [],
+                        sort_by: Literal["relevance",
+                                          "lastUpdatedDate",
+                                          "submittedDate"] = "relevance",
+                        sort_order: Literal["ascending", "descending"] = "descending"
+                        ) -> list:
+            """
+            arxiv = ArxivAPIWrapper(query=query, 
+                                    max_results=max_results, 
+                                    load_max_refs=load_max_refs,
+                                    categories=categories,
+                                    sort_order=sort_order,
+                                    sort_by=sort_by)
+            docs = arxiv.load(query)
+            for i, doc in enumerate(docs):
+                doc.metadata["id"] = str(uuid.uuid4())
+                doc.metadata["source"] = "arXiv"
+            save_documents_to_json(docs)
+            return docs
 
         tools = [arxiv_search]
         tool_node = ToolNode(tools)
