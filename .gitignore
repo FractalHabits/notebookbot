@@ -143,10 +143,10 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# End of https://www.toptal.com/developers/gitignore/api/python
-
 # Generated version file
 _version.py
 
 .mypy_cache/
 .vscode/settings.json
+
+/data/raw/*
