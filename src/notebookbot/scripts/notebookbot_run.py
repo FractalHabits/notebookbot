@@ -24,7 +24,8 @@ from langgraph.prebuilt import ToolNode
 # Local application imports
 from notebookbot.authentication.authentication_manager import AuthenticationManager
 from notebookbot.authentication.authentication_setup import AuthenticationSetup
-from notebookbot.data.save_documents_to_json import save_documents_to_json
+from notebookbot.data_help.save_documents_to_json import save_documents_to_json
+
 def main():
     # Get API keys
     auth = AuthenticationSetup()
