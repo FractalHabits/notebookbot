@@ -149,4 +149,5 @@ _version.py
 .mypy_cache/
 .vscode/settings.json
 
+/data/raw/
 /data/raw/*
