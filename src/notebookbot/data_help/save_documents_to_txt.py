@@ -1,11 +1,11 @@
-import json
 import os
 from typing import List
 from langchain.docstore.document import Document
 
-def save_documents_to_json(documents: List[Document], directory: str = "data/raw/json"):
+def save_documents_to_txt(documents: List[Document], directory: str = "data/raw/txt"):
     """
-    Save a list of LangChain documents as individual JSON files in the specified directory.
+    Save a list of LangChain documents as individual text files in the specified directory.
+    Metadata is included at the top of each file.
     """
     os.makedirs(directory, exist_ok=True)
 
@@ -15,6 +15,12 @@ def save_documents_to_json(documents: List[Document], directory: str = "data/raw
         if not doc_id:
             raise ValueError("Document must have an 'id', 'source', or 'file_path' field in its metadata.")
 
-        file_path = os.path.join(directory, f"{doc_title}.json")
+        file_path = os.path.join(directory, f"{doc_title}.txt")
         with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(doc.model_dump(), f, ensure_ascii=False, indent=2)
+            # Write metadata
+            f.write("Metadata:\n")
+            for key, value in doc.metadata.items():
+                f.write(f"{key}: {value}\n")
+            f.write("\nContent:\n")
+            # Write content
+            f.write(doc.page_content)
