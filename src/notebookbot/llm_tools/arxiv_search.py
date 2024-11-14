@@ -5,6 +5,7 @@ from langchain_community.document_loaders import ArxivLoader
 from langchain_community.utilities import ArxivAPIWrapper
 from langchain_core.tools import tool
 from notebookbot.data_help.save_documents_to_json import save_documents_to_json
+from notebookbot.data_help.save_documents_to_txt import save_documents_to_txt
 
 @tool
 def arxiv_search(query: str,
@@ -39,4 +40,5 @@ def arxiv_search(query: str,
                 doc.metadata["id"] = str(uuid.uuid4())
                 doc.metadata["source"] = "arXiv"
             save_documents_to_json(docs)
+            save_documents_to_txt(docs)
             return docs
