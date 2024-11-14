@@ -2,7 +2,7 @@ import os
 from typing import List
 from langchain.docstore.document import Document
 
-def save_documents_to_txt(documents: List[Document], directory: str = "data/raw/txt"):
+def save_documents_to_txt(documents: List[Document], directory: str = "../data/raw/txt"):
     """
     Save a list of LangChain documents as individual text files in the specified directory.
     Metadata is included at the top of each file.

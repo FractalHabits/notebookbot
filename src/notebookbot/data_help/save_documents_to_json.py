@@ -3,7 +3,7 @@ import os
 from typing import List
 from langchain.docstore.document import Document
 
-def save_documents_to_json(documents: List[Document], directory: str = "data/raw/json"):
+def save_documents_to_json(documents: List[Document], directory: str = "../data/raw/json"):
     """
     Save a list of LangChain documents as individual JSON files in the specified directory.
     """
