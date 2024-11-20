@@ -11,9 +11,7 @@ from typing import Annotated, Literal, TypedDict
 # Third-party imports
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
-from langchain_community.document_loaders import ArxivLoader
 from langchain_community.tools import BraveSearch
-from langchain_community.utilities import ArxivAPIWrapper
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.tools import tool
 from langgraph.checkpoint.memory import MemorySaver
@@ -23,7 +21,9 @@ from langgraph.prebuilt import ToolNode
 # Local application imports
 from notebookbot.authentication.authentication_manager import AuthenticationManager
 from notebookbot.authentication.authentication_setup import AuthenticationSetup
-
+from notebookbot.data_help.save_documents_to_json import save_documents_to_json
+from notebookbot.llm_tools.arxiv_search import arxiv_search
+from notebookbot.llm_tools.query_documents import query_documents
 def main():
     # Get API keys
     auth = AuthenticationSetup()
@@ -34,13 +34,7 @@ def main():
         api_keys = auth.get_api_keys()
         
         # Setup LangChain
-        @tool
-        def arxiv_search(query: str):
-            """Call to search arxiv."""
-            arxiv = ArxivAPIWrapper()
-            return arxiv.run(query)
-
-        tools = [arxiv_search]
+        tools = [arxiv_search, query_documents]
         tool_node = ToolNode(tools)
 
         model = ChatAnthropic(
