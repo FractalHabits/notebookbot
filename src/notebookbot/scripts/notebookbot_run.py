@@ -23,7 +23,7 @@ from notebookbot.authentication.authentication_manager import AuthenticationMana
 from notebookbot.authentication.authentication_setup import AuthenticationSetup
 from notebookbot.data_help.save_documents_to_json import save_documents_to_json
 from notebookbot.llm_tools.arxiv_search import arxiv_search
-
+from notebookbot.llm_tools.query_documents import query_documents
 def main():
     # Get API keys
     auth = AuthenticationSetup()
@@ -34,7 +34,7 @@ def main():
         api_keys = auth.get_api_keys()
         
         # Setup LangChain
-        tools = [arxiv_search]
+        tools = [arxiv_search, query_documents]
         tool_node = ToolNode(tools)
 
         model = ChatAnthropic(
