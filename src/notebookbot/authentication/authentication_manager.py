@@ -28,13 +28,13 @@ class AuthenticationManager:
             self.is_authenticated = True
             print("Authentication successful.")
         else:
-            print("Authentication failed.")
+            print('Authentication failed, must be longer than 16 and contain "!@#$%^&*()_+-=".')
 
     def _get_password(self):
         return getpass.getpass("Enter your password: ")
 
     def _validate_password(self, password: str) -> bool:
-        # Implement your password validation logic here
+        """Validate password length and presence of required symbols."""
         return len(password) >= self.min_length and any(char in self.required_symbols for char in password)
 
     def add_api_key(self, key_name: Union[str, None]=None, api_key: Union[str, None]=None):
