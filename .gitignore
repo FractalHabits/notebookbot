@@ -1,6 +1,7 @@
 # Virtual environment
 .venv/
 .venv*
+.cap
 
 # Environment variables
 .env
@@ -153,3 +154,9 @@ _version.py
 
 /data/raw/
 /data/raw/*
+
+#other
+proompts.txt
+chroma_db/
+chromadb.log
+*.sh

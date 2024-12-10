@@ -20,10 +20,22 @@ class APIKeys:
     anthropic: str
 
 class AuthenticationSetup:
+    _instance = None
+    _api_keys = None  # Class variable to store API keys
+    _is_authenticated = False  # Add static authentication state
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._initialized = False
+        return cls._instance
+
     def __init__(self, env_file_path: str = '.env'):
-        self.env_file_path = env_file_path
-        self.auth_manager = None
-        self._setup_env_file()
+        if not getattr(self, '_initialized', False):
+            self.env_file_path = env_file_path
+            self.auth_manager = None
+            self._setup_env_file()
+            self._initialized = True
         
     def _setup_env_file(self):
         """Ensure .env file exists and has required structure."""
@@ -42,12 +54,17 @@ class AuthenticationSetup:
         """Set up password or authenticate with existing one."""
         from notebookbot.authentication.authentication_manager import AuthenticationManager
         
+        # If already authenticated, return True immediately
+        if AuthenticationSetup._is_authenticated:
+            return True
+
         # Check if keys already exist
         if self._keys_exist():
             print("Keys already exist. Skipping password setup.")
             self.auth_manager = AuthenticationManager(self.env_file_path)
             if self._try_authenticate(self.auth_manager):
                 self._show_available_keys()
+                AuthenticationSetup._is_authenticated = True  # Set authenticated state
                 return True
             return False
 
@@ -68,6 +85,7 @@ class AuthenticationSetup:
             if self._try_authenticate(self.auth_manager):
                 self._show_available_keys()
                 self._setup_keys()  # Add this line to set up keys if none exist
+                AuthenticationSetup._is_authenticated = True  # Set authenticated state
                 return True
         
         return False
@@ -235,10 +253,11 @@ def get_existing_keys(auth_manager):
         return set()
 
 
-def main():
+'''def main():
     setup = AuthenticationSetup()
     if setup.authenticate():
         setup._setup_keys()  # Call the _setup_keys method here
 
 if __name__ == "__main__":
     main()
+'''

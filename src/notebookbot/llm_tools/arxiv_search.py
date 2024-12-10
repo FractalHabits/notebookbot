@@ -6,6 +6,7 @@ from langchain_community.utilities import ArxivAPIWrapper
 from langchain_core.tools import tool
 from notebookbot.data_help.save_documents_to_json import save_documents_to_json
 from notebookbot.data_help.save_documents_to_txt import save_documents_to_txt
+from notebookbot.chromadb.chromadb_manager import ChromaDBManager
 
 @tool
 def arxiv_search(query: str,
@@ -41,4 +42,8 @@ def arxiv_search(query: str,
                 doc.metadata["source"] = "arXiv"
             save_documents_to_json(docs)
             save_documents_to_txt(docs)
+            chromadb_manager = ChromaDBManager()
+            chromadb_manager.reset_collection()
+            chromadb_manager.add_documents(docs)
+            chromadb_manager.load_and_embed_txt_documents()
             return docs
